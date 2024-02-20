@@ -15,8 +15,10 @@ Widget getTabScreens({required int index, required CameraDescription camera}) {
 }
 
 const countryList = [
-  "da",
+  "eg",
   "in",
   "af",
   "de",
+  "gb",
+  "ru",
 ];
