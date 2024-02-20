@@ -1,4 +1,4 @@
-import 'package:country_flags/country_flags.dart';
+import 'package:country_icons/country_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:major_project/components/top_bar.dart';
 import 'package:major_project/constant.dart';
@@ -39,8 +39,14 @@ class HomeScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                           color: Colors.grey[200],
                         ),
-                        child: CountryFlag.fromCountryCode(
-                          countryList[index],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 55,
+                            horizontal: 15,
+                          ),
+                          child: Container(
+                            child: CountryIcons.getSvgFlag(countryList[index]),
+                          ),
                         ),
                       ),
                     );
