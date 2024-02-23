@@ -12,22 +12,27 @@ class TopBar extends StatelessWidget {
         color: Color.fromARGB(255, 246, 239, 247),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
       ),
-      child: const Column(
+      child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CircleAvatar(
-                  backgroundColor: Color.fromARGB(255, 171, 134, 241),
-                  child: Icon(
-                    Icons.emoji_people_sharp,
-                    color: Colors.white,
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 2.0, // Adjust outline thickness
+                    ),
+                  ),
+                  child: const CircleAvatar(
+                    backgroundImage: AssetImage("assets/image.png"),
                   ),
                 ),
-                SizedBox(width: 8),
-                Column(
+                const SizedBox(width: 8),
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -51,7 +56,7 @@ class TopBar extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
+          const Padding(
             padding: EdgeInsets.symmetric(horizontal: 18),
             child: TextField(
               decoration: InputDecoration(
@@ -73,7 +78,7 @@ class TopBar extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 30,
           )
         ],
