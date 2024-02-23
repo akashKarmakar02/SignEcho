@@ -34,18 +34,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         // body: SafeArea(child: TabScreens[index]),
-        body: PageTransitionSwitcher(
-          transitionBuilder: (child, primaryAnimation, secondaryAnimation) =>
-              SharedAxisTransition(
-            animation: primaryAnimation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.horizontal,
-            child: child,
-          ),
-          child: Center(
-            child: getTabScreens(index: index, camera: widget.camera),
-          ),
-        ),
+        body: getTabScreens(index: index, camera: widget.camera),
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
           child: GNav(
@@ -59,7 +48,7 @@ class _MyAppState extends State<MyApp> {
             haptic: true, // haptic feedback
             gap: 8,
             activeColor: const Color.fromARGB(255, 171, 134, 241),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             tabs: const [
               GButton(icon: Icons.home_outlined, text: "Home"),
               GButton(icon: Icons.camera_alt_outlined, text: "Camera"),
