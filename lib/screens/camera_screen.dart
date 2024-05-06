@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/io.dart';
 
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -18,7 +20,9 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  late Uint8List _image;
+  late IOWebSocketChannel _channel;
+  late Timer _timer;
+  bool _isCapturing = false;
 
   @override
   void initState() {
@@ -28,22 +32,36 @@ class _CameraScreenState extends State<CameraScreen> {
       ResolutionPreset.veryHigh,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
-    // Initialize the controller. Returns a Future.
     _initializeControllerFuture = _controller.initialize();
+    _channel = IOWebSocketChannel.connect('ws://192.168.33.98:8000/predict');
+    _channel.stream.listen((data) {
+      print("Received data: $data");
+    });
+    _startSendingImages();
+  }
 
-    _initializeControllerFuture.then((value) => {
-          _controller.startImageStream((image) {
-            setState(() {
-              _image = image.planes.first.bytes;
-            });
-          })
-        });
+  void _startSendingImages() async {
+    await _initializeControllerFuture;
+    _timer = Timer.periodic(const Duration(milliseconds: 20), (_) {
+      _captureAndSendImage();
+    });
+  }
+
+  void _captureAndSendImage() async {
+    if (!_isCapturing) {
+      _isCapturing = true;
+      XFile? imageFile = await _controller.takePicture();
+      Uint8List imageBytes = await imageFile.readAsBytes();
+      _channel.sink.add(imageBytes);
+      _isCapturing = false;
+    }
   }
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
     _controller.dispose();
+    _timer.cancel();
+    _channel.sink.close();
     super.dispose();
   }
 
