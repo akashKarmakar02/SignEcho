@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
@@ -23,6 +24,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late IOWebSocketChannel _channel;
   late Timer _timer;
   bool _isCapturing = false;
+  Map<String, int>? _boxCoordinates;
 
   @override
   void initState() {
@@ -33,9 +35,13 @@ class _CameraScreenState extends State<CameraScreen> {
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
     _initializeControllerFuture = _controller.initialize();
-    _channel = IOWebSocketChannel.connect('ws://192.168.33.98:8000/predict');
+    _channel = IOWebSocketChannel.connect('ws://sign-echo-nexesgroup-3980cdcb.koyeb.app/predict');
     _channel.stream.listen((data) {
-      print("Received data: $data");
+      var jsonData = jsonDecode(data);
+      print("Received data: ${jsonData['prediction']}");
+      setState(() {
+        _boxCoordinates = Map<String, int>.from(jsonData['prediction']);
+      });
     });
     _startSendingImages();
   }
@@ -68,15 +74,28 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Wait until the controller is initialized before displaying the camera feed.
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            // If the Future is complete, display the camera preview.
-            return CameraPreview(_controller);
+            return Stack(
+              children: [
+                CameraPreview(_controller),
+                if (_boxCoordinates != null)
+                  Positioned(
+                    left: 300, //_boxCoordinates!['x1']!.toDouble()
+                    top: 200, //_boxCoordinates!['y1']!.toDouble()
+                    child: Container(
+                      width: 100, //(_boxCoordinates!['x2']! - _boxCoordinates!['x1']!).toDouble()
+                      height: 100, //(_boxCoordinates!['y2']! - _boxCoordinates!['y1']!).toDouble()
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.red, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
+            );
           } else {
-            // Otherwise, display a loading indicator.
             return const Center(
               child: CircularProgressIndicator(),
             );
