@@ -32,7 +32,6 @@ class _MyAppState extends State<MyApp> {
     super.widget.camera;
     return MaterialApp(
       home: Scaffold(
-        // body: SafeArea(child: TabScreens[index]),
         body: getTabScreens(index: index, camera: widget.camera),
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),

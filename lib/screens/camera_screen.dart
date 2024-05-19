@@ -6,6 +6,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 
+import '../components/camera_painter.dart';
+
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
 
@@ -24,7 +26,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late IOWebSocketChannel _channel;
   late Timer _timer;
   bool _isCapturing = false;
-  Map<String, int>? _boxCoordinates;
+  Map<String, dynamic>? _boxCoordinates;
 
   @override
   void initState() {
@@ -35,12 +37,14 @@ class _CameraScreenState extends State<CameraScreen> {
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
     _initializeControllerFuture = _controller.initialize();
-    _channel = IOWebSocketChannel.connect('ws://sign-echo-nexesgroup-3980cdcb.koyeb.app/predict');
+    _channel = IOWebSocketChannel.connect(
+        'ws://perfect-above-lamprey.ngrok-free.app/predict');
     _channel.stream.listen((data) {
       var jsonData = jsonDecode(data);
-      print("Received data: ${jsonData['prediction']}");
+      print(
+          "Received data: ${jsonData['prediction']} ${jsonData['prediction'] is Map<String, dynamic>}");
       setState(() {
-        _boxCoordinates = Map<String, int>.from(jsonData['prediction']);
+        _boxCoordinates = Map<String, dynamic>.from(jsonData['prediction']);
       });
     });
     _startSendingImages();
@@ -82,16 +86,8 @@ class _CameraScreenState extends State<CameraScreen> {
               children: [
                 CameraPreview(_controller),
                 if (_boxCoordinates != null)
-                  Positioned(
-                    left: 300, //_boxCoordinates!['x1']!.toDouble()
-                    top: 200, //_boxCoordinates!['y1']!.toDouble()
-                    child: Container(
-                      width: 100, //(_boxCoordinates!['x2']! - _boxCoordinates!['x1']!).toDouble()
-                      height: 100, //(_boxCoordinates!['y2']! - _boxCoordinates!['y1']!).toDouble()
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.red, width: 2),
-                      ),
-                    ),
+                  CustomPaint(
+                    painter: CameraPainter(_boxCoordinates!),
                   ),
               ],
             );
